@@ -102,7 +102,7 @@
     <Compile Include="Util\SocketEx.cs" />
     <Compile Include="Util\ThreadPoolEx.cs" />
     <Compile Include="Util\KeyGenerator.cs" />
-    <Compile Include="Web\BinaryContentResult.cs" />
+    <Compile Include="Web\BinaryResult.cs" />
     <Compile Include="Web\CustomHeaderModule.cs" />
   </ItemGroup>
   <ItemGroup>

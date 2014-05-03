@@ -4,19 +4,22 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using BitBox.Web;
+using BitBox.Core;
 
 namespace BitBoxWebServerExample.Controllers
 {
     public class TestController : Controller
     {
-        public BinaryContentResult TestBinary()
+        public BinaryResult TestBinary(Packet recvPacket)
         {
-            //string temp = Encoding.UTF8.GetString(bytedata);
+            string d1 = recvPacket.ReadString();
+            int d2 = recvPacket.ReadInt();
 
-            byte[] buffer = new byte[HttpContext.Request.ContentLength];
-            HttpContext.Request.InputStream.Read(buffer, 0, buffer.Length);
+            Packet sendPacket = new Packet(1);
+            sendPacket.WriteString("응답데이터");
+            sendPacket.WriteInt(11111);
 
-            return new BinaryContentResult() { Data = buffer, Headers = HttpContext.Response.Headers };
+            return new BinaryResult() { Data = new ArraySegment<byte>(sendPacket.m_pData, 0, sendPacket.GetTotalPacketSize()), Headers = HttpContext.Response.Headers };
         }
     }
 }

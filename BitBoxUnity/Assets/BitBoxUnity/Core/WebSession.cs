@@ -42,12 +42,18 @@ namespace BitBoxUnity.Core
 
         private IEnumerator ReceiveCallback(WWW www)
         {
+
+            // TODO 에러처리 필요
+
             yield return www;
             if (www.error == null)
             {
-                // TODO 여기서 패킷객체 생성해서 핸들러로 패스
                 if (Received != null)
                     Received(www.bytes, 0, www.bytes.Length);
+            }
+            else
+            {
+                Debug.LogError(www.error);
             }
 
             www.Dispose();
@@ -66,7 +72,7 @@ namespace BitBoxUnity.Core
             Hashtable headers = new Hashtable();
             headers.Add("Content-Length", length);
             headers.Add("Content-Type", "binary/octet-stream");
-            StartCoroutine(ReceiveCallback(new WWW(string.Format("{0}:{1}/{2}", RemoteAddress, Port, id), buffer, headers)));
+            StartCoroutine(ReceiveCallback(new WWW(string.Format("http://{0}:{1}/{2}", RemoteAddress, Port, id), buffer, headers)));
         }
 
         public override void Update()

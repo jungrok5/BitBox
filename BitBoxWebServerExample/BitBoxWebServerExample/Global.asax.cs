@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BitBoxWebServerExample.Scripts.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -15,6 +16,8 @@ namespace BitBoxWebServerExample
         protected void Application_Start()
         {
             AreaRegistration.RegisterAllAreas();
+
+            ModelBinders.Binders.Add(typeof(Packet), new PacketBinder());
 
             WebApiConfig.Register(GlobalConfiguration.Configuration);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);

@@ -49,6 +49,7 @@
      <Compile Include="Assets\BitBoxUnity\Core\AppSession.cs" />
      <Compile Include="Assets\BitBoxUnity\Core\SessionBase.cs" />
      <Compile Include="Assets\BitBoxUnity\Core\WebSession.cs" />
+     <Compile Include="Assets\BitBoxUnityExample\CSCommon\Packet.cs" />
      <Compile Include="Assets\BitBoxUnityExample\Scripts\Test.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

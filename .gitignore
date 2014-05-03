@@ -213,3 +213,6 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+BitBoxUnity/Temp/UnityLockfile
+BitBoxUnity/Library/AnnotationManager
+BitBoxUnity/Library/AssetImportState
