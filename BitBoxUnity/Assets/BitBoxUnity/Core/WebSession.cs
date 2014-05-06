@@ -42,7 +42,6 @@ namespace BitBoxUnity.Core
 
         private IEnumerator ReceiveCallback(WWW www)
         {
-
             // TODO 에러처리 필요
 
             yield return www;
@@ -66,9 +65,6 @@ namespace BitBoxUnity.Core
 
             base.Send(id, buffer, offset, length);
 
-            // TODO id는 호출할 URL의 일부이겠다 여기서 WWW 코루틴을 돌린다?
-            // 사이즈는 Content-Length에 넣고 Cotent-Type을 설정해주자
-            // 아래 임시 코드임
             Hashtable headers = new Hashtable();
             headers.Add("Content-Length", length);
             headers.Add("Content-Type", "binary/octet-stream");
