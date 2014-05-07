@@ -9,14 +9,14 @@ using BitBoxWebServerExample.Scripts.Core;
 
 namespace BitBoxWebServerExample.Controllers
 {
-    public class CS_TEST_REQController : Controller
+    public class CS_ECHO_WEB_REQController : Controller
     {
         [HttpPost]
         public BinaryResult ProcessReceive(Packet recvPacket)
         {
             string data = recvPacket.ReadString();
 
-            Packet sendPacket = new Packet((ushort)ProtocolID.CS_TEST_ACK);
+            Packet sendPacket = new Packet((ushort)ProtocolID.CS_ECHO_WEB_ACK);
             sendPacket.WriteString(data); // echo
 
             return new PacketResult(sendPacket);

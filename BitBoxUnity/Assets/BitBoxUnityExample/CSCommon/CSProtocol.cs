@@ -12,8 +12,13 @@ namespace BitBoxExample.CSCommon
     public enum ProtocolID : ushort
     {
         PROTOCOL_CS_AU_START = ProtocolBase.PROTOCOL_BASE_CS,
-        CS_TEST_REQ,
-        CS_TEST_ACK,
+        
+        CS_ECHO_WEB_REQ,
+        CS_ECHO_WEB_ACK,
+
+        CS_ECHO_APP_REQ,
+        CS_ECHO_APP_ACK,
+
         PROTOCOL_CS_AU_END,
     };
 }
