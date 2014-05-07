@@ -5,6 +5,8 @@ using System.Web;
 using System.Web.Mvc;
 using BitBox.Web;
 using BitBox.Core;
+using BitBoxExample.CSCommon;
+using BitBoxWebServerExample.Scripts.Core;
 
 namespace BitBoxWebServerExample.Controllers
 {
@@ -19,7 +21,7 @@ namespace BitBoxWebServerExample.Controllers
             sendPacket.WriteString("응답데이터");
             sendPacket.WriteInt(11111);
 
-            return new BinaryResult() { Data = new ArraySegment<byte>(sendPacket.m_pData, 0, sendPacket.GetTotalPacketSize()), Headers = HttpContext.Response.Headers };
+            return new PacketResult(sendPacket);
         }
     }
 }

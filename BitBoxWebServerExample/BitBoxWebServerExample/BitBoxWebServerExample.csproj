@@ -108,8 +108,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\BitBoxUnity\Assets\BitBoxUnityExample\CSCommon\CSProtocol.cs">
+      <Link>Scripts\CSCommon\CSProtocol.cs</Link>
+    </Compile>
     <Compile Include="..\..\BitBoxUnity\Assets\BitBoxUnityExample\CSCommon\Packet.cs">
-      <Link>CSCommon\Packet.cs</Link>
+      <Link>Scripts\CSCommon\Packet.cs</Link>
     </Compile>
     <Compile Include="Controllers\TestController.cs" />
     <Compile Include="Global.asax.cs">
@@ -117,6 +120,7 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scripts\Core\PacketBinder.cs" />
+    <Compile Include="Scripts\Core\PacketResult.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\FilterConfig.cs" />
