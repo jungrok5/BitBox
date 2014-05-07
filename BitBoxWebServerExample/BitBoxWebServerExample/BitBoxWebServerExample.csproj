@@ -114,7 +114,7 @@
     <Compile Include="..\..\BitBoxUnity\Assets\BitBoxUnityExample\CSCommon\Packet.cs">
       <Link>Scripts\CSCommon\Packet.cs</Link>
     </Compile>
-    <Compile Include="Controllers\TestController.cs" />
+    <Compile Include="Controllers\CS_TEST_REQController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>

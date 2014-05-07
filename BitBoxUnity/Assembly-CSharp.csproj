@@ -51,6 +51,7 @@
      <Compile Include="Assets\BitBoxUnity\Core\WebSession.cs" />
      <Compile Include="Assets\BitBoxUnityExample\CSCommon\CSProtocol.cs" />
      <Compile Include="Assets\BitBoxUnityExample\CSCommon\Packet.cs" />
+     <Compile Include="Assets\BitBoxUnityExample\Scripts\Main.cs" />
      <Compile Include="Assets\BitBoxUnityExample\Scripts\Network\ClientNetwork.cs" />
      <Compile Include="Assets\BitBoxUnityExample\Scripts\Network\ClientNetwork_Recv.cs" />
      <Compile Include="Assets\BitBoxUnityExample\Scripts\Network\ClientNetwork_Send.cs" />

@@ -9,7 +9,7 @@ public partial class ClientNetwork : Singleton<ClientNetwork>
 {
     void On_CS_TEST_ACK(Packet packet)
     {
-        string test = packet.ReadString();
-        Debug.Log("test:" + test);
+        string data = packet.ReadString();
+        Debug.Log("RECV from Server:" + data);
     }
 }

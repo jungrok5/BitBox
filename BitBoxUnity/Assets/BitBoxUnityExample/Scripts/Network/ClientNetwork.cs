@@ -20,7 +20,7 @@ public partial class ClientNetwork : Singleton<ClientNetwork>
         m_WebSession = go.AddComponent<WebSession>();
 
         m_WebSession.Received += HandleReceive_Web;
-        m_WebSession.Connect("localhost", 1369);
+        m_WebSession.Connect("localhost", 57778);
     }
 
     void HandleReceive(Packet packet)
