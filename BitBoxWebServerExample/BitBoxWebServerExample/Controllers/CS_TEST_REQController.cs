@@ -11,6 +11,7 @@ namespace BitBoxWebServerExample.Controllers
 {
     public class CS_TEST_REQController : Controller
     {
+        [HttpPost]
         public BinaryResult ProcessReceive(Packet recvPacket)
         {
             string data = recvPacket.ReadString();

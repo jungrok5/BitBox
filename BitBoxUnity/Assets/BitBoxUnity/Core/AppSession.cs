@@ -34,7 +34,7 @@ namespace BitBoxUnity.Core
                 m_Socket = socket;
 
                 if (Connected != null)
-                    Connected();
+                    Connected(string.Format("{0}:{1}", RemoteAddress, Port));
 
                 m_Socket.BeginReceive(m_RecvBuffer, 0, BUFFER_SIZE, 0, ReceiveCallback, null);
             }
@@ -50,7 +50,7 @@ namespace BitBoxUnity.Core
                 return;
 
             if (Disconnected != null)
-                Disconnected();
+                Disconnected(string.Format("{0}:{1}", RemoteAddress, Port));
 
             m_Socket.Shutdown(SocketShutdown.Both);
             m_Socket.Close();

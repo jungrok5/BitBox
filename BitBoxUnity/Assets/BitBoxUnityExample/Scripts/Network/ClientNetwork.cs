@@ -4,44 +4,38 @@ using System.Collections.Generic;
 using BitBoxUnity.Core;
 using System.Reflection;
 using BitBoxExample.CSCommon;
+using System;
 
 public partial class ClientNetwork : Singleton<ClientNetwork>
 {
     private static readonly string STRING_FORMAT_RECV = "On_{0}";
 
+    private AppSession m_AppSession;
     private WebSession m_WebSession;
+
     private Queue<Packet> m_RecvPacketList;
 
     void Start()
     {
         m_RecvPacketList = new Queue<Packet>();
 
-        GameObject go = new GameObject("WebSession");
-        m_WebSession = go.AddComponent<WebSession>();
+        CreateSession_Web();
+        CreateSession_App();
 
-        m_WebSession.Received += HandleReceive_Web;
-        m_WebSession.Connect("localhost", 57778);
+        ConnectSession_Web("localhost", 57778);
+        //ConnectSession_App("localhost", 12345);
     }
 
-    void HandleReceive(Packet packet)
+    void ReceiveHandler(Packet packet)
     {
         string handleFuncName = string.Format(STRING_FORMAT_RECV, ((ProtocolID)packet.GetID()).ToString());
         MethodInfo mi = this.GetType().GetMethod(handleFuncName, BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
         if (mi == null)
         {
-            Debug.LogWarning("Not exists message function:" + handleFuncName);
+            Debug.LogWarning(string.Format("Not exists message handler function:{0}", handleFuncName));
             return;
         }
         mi.Invoke(this, new object[] { packet });   
-    }
-
-    void HandleReceive_Web(byte[] buffer, int offset, int length)
-    {
-        Packet recvPacket = new Packet(buffer, length);
-        lock (m_RecvPacketList)
-        {
-            m_RecvPacketList.Enqueue(recvPacket);
-        }
     }
 
     void Update()
@@ -51,15 +45,22 @@ public partial class ClientNetwork : Singleton<ClientNetwork>
             if (m_RecvPacketList.Count <= 0)
                 return;
 
-            HandleReceive(m_RecvPacketList.Dequeue());         
+            ReceiveHandler(m_RecvPacketList.Dequeue());         
         }
     }
 
-    void SendPacket_Web(Packet packet)
+    void OnConnect(string endpoint)
     {
-        if (m_WebSession == null)
-            return;
+        Debug.Log(string.Format("OnConnect:{0}", endpoint));
+    }
 
-        m_WebSession.Send(((ProtocolID)packet.GetID()).ToString(), packet.m_pData, 0, (ushort)packet.GetTotalPacketSize());
+    void OnDisconnect(string endpoint)
+    {
+        Debug.Log(string.Format("OnDisconnect:{0}", endpoint));
+    }
+
+    void OnError(string message, Exception e)
+    {
+        Debug.Log(string.Format("OnError:{0} {1}", message, e != null ? e.Message : string.Empty));
     }
 }

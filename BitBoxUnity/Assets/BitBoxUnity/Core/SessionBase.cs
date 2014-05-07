@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 namespace BitBoxUnity.Core
 {
@@ -12,10 +13,10 @@ namespace BitBoxUnity.Core
 
     public class SessionBase<TIDType> : MonoBehaviour
     {
-        public delegate void ConnectHandler();
-        public delegate void DisconnectHandler();
+        public delegate void ConnectHandler(string endpoint);
+        public delegate void DisconnectHandler(string endpoint);
         public delegate void ReceiveHandler(byte[] buffer, int offset, int length);
-        public delegate void ErrorHandler(string message);
+        public delegate void ErrorHandler(string message, Exception e);
 
         public ConnectHandler Connected;
         public DisconnectHandler Disconnected;

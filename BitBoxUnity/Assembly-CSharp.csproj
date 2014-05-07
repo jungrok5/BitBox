@@ -53,8 +53,10 @@
      <Compile Include="Assets\BitBoxUnityExample\CSCommon\Packet.cs" />
      <Compile Include="Assets\BitBoxUnityExample\Scripts\Main.cs" />
      <Compile Include="Assets\BitBoxUnityExample\Scripts\Network\ClientNetwork.cs" />
+     <Compile Include="Assets\BitBoxUnityExample\Scripts\Network\ClientNetwork_App.cs" />
      <Compile Include="Assets\BitBoxUnityExample\Scripts\Network\ClientNetwork_Recv.cs" />
      <Compile Include="Assets\BitBoxUnityExample\Scripts\Network\ClientNetwork_Send.cs" />
+     <Compile Include="Assets\BitBoxUnityExample\Scripts\Network\ClientNetwork_Web.cs" />
      <Compile Include="Assets\BitBoxUnityExample\Scripts\Util\Singleton.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

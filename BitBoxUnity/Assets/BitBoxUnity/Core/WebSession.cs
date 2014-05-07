@@ -6,6 +6,10 @@ namespace BitBoxUnity.Core
     public class WebSession : SessionBase<string>
     {
         private static readonly int BUFFER_SIZE = 8192;
+        private static readonly string CONTENT_LENGTH = "Content-Length";
+        private static readonly string CONTENT_TYPE = "Content-Type";
+        private static readonly string BINARY_OCTET_STREAM = "binary/octet-stream";
+        private static readonly string URL = "http://{0}:{1}/{2}";
 
         protected byte[] m_RecvBuffer;
 
@@ -19,7 +23,7 @@ namespace BitBoxUnity.Core
             m_RecvBuffer = new byte[BUFFER_SIZE];
 
             if (Connected != null)
-                Connected();
+                Connected(string.Format("{0}:{1}", RemoteAddress, Port));
         }
 
         public override void Disconnect()
@@ -28,7 +32,7 @@ namespace BitBoxUnity.Core
                 return;
 
             if (Disconnected != null)
-                Disconnected();
+                Disconnected(string.Format("{0}:{1}", RemoteAddress, Port));
 
             m_RecvBuffer = null;
 
@@ -42,9 +46,8 @@ namespace BitBoxUnity.Core
 
         private IEnumerator ReceiveCallback(WWW www)
         {
-            // TODO 에러처리 필요
-
             yield return www;
+
             if (www.error == null)
             {
                 if (Received != null)
@@ -52,7 +55,8 @@ namespace BitBoxUnity.Core
             }
             else
             {
-                Debug.LogError(www.error);
+                if (Error != null)
+                    Error(www.error, null);
             }
 
             www.Dispose();
@@ -65,10 +69,13 @@ namespace BitBoxUnity.Core
 
             base.Send(id, buffer, offset, length);
 
+            // [주의]
+            // 유니티의 WWW클래스는 아래 인자로 넣어주는 buffer의 사이즈를 Content-Length로 넘겨버리기 때문에
+            // buffer에는 넘겨주려는 데이터만 담겨있어야한다
             Hashtable headers = new Hashtable();
-            headers.Add("Content-Length", length);
-            headers.Add("Content-Type", "binary/octet-stream");
-            StartCoroutine(ReceiveCallback(new WWW(string.Format("http://{0}:{1}/{2}", RemoteAddress, Port, id), buffer, headers)));
+            headers.Add(CONTENT_LENGTH, length);
+            headers.Add(CONTENT_TYPE, BINARY_OCTET_STREAM);
+            StartCoroutine(ReceiveCallback(new WWW(string.Format(URL, RemoteAddress, Port, id), buffer, headers)));
         }
 
         public override void Update()
