@@ -13,8 +13,7 @@ namespace BitBox
     {
         static void Main(string[] args)
         {
-            Console.WriteLine(Assembly.GetExecutingAssembly().FullName);
-            ServerExecuter<TestServer>.Execute(args);
+            ServerExecuter<TestServer>.Execute(args, "0.0.1");
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -8,6 +10,7 @@ using System.ServiceProcess;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 using BitBox.Log;
 using BitBox.Util;
 
@@ -21,12 +24,13 @@ namespace BitBox.Core
 
     public partial class Server : ServiceBase
     {
+        public string Name { get; protected set; }
+        public string Version { get; protected set; }
+
         public bool IsRunning { get; set; }
         public bool IsStopped { get; set; }
 
         public ServerConfig m_ServerConfig;
-        public ListenerConfig[] m_ListenerConfigs;
-
         public List<Listener> m_Listeners;
 
         private ConcurrentDictionary<long, Session> m_Sessions;
@@ -41,44 +45,31 @@ namespace BitBox.Core
         public static string ModuleName;
         protected ServerExecuteType ExecuteType;
 
-        public virtual bool Init(ServerExecuteType executeType)
+        public virtual bool Init(ServerExecuteType executeType, string version, string name = null)
         {
             IsRunning = false;
             IsStopped = false;
 
-            // TODO 설정파일을 읽어서 셋팅!
-            // 버퍼 생성
-            // 풀생성 (최대 커넥션만큼) 핸들러연결
-
-            // 스레드풀 및 IOCP풀 갯수 설정, 최대 스레드수는 프로세서수로 기본설정되어있음
-            TheadPoolEx.SetMinMaxThreads(
-                Environment.ProcessorCount,
-                Environment.ProcessorCount,
-                Environment.ProcessorCount * 2,
-                Environment.ProcessorCount * 2);
-
             ExecuteType = executeType;
-            ModuleName = System.Diagnostics.Process.GetCurrentProcess().ProcessName;
-
-            m_ServerConfig = new ServerConfig();
-            m_ServerConfig.MaxConnectionNumber = 20000;
-            m_ServerConfig.MaxAcceptOps = 3;
-            m_ServerConfig.ReceiveBufferSize = 4096;
-            m_ServerConfig.SendBufferSize = 4096;
-            m_ServerConfig.SendTimeOut = 10000;
-            m_ServerConfig.Version = "0.0.1";
-
-            m_ListenerConfigs = new ListenerConfig[1];
-            m_ListenerConfigs[0] = new ListenerConfig();
-            m_ListenerConfigs[0].EndPoint = new IPEndPoint(IPAddress.Any, 55555);
-            m_ListenerConfigs[0].BackLog = 100;
-
-            m_Sessions = new ConcurrentDictionary<long, Session>();
-            m_Listeners = new List<Listener>();
+            Name = string.IsNullOrEmpty(name) == true ? Process.GetCurrentProcess().ProcessName : name;
+            Version = version;
+            ModuleName = Name;
 
             CreateLogger();
 
             Logger.Info("Init");
+
+            if (LoadServerConfig() == false)
+                return false;
+
+            TheadPoolEx.SetMinMaxThreads(
+                m_ServerConfig.MinWorkerThreads == 0 ? Environment.ProcessorCount : m_ServerConfig.MinWorkerThreads,
+                m_ServerConfig.MaxWorkerThreads == 0 ? Environment.ProcessorCount * 2: m_ServerConfig.MaxWorkerThreads,
+                m_ServerConfig.MinCompletionPortThreads == 0 ? Environment.ProcessorCount : m_ServerConfig.MinCompletionPortThreads,
+                m_ServerConfig.MaxCompletionPortThreads == 0 ? Environment.ProcessorCount * 2 : m_ServerConfig.MaxCompletionPortThreads);
+       
+            m_Sessions = new ConcurrentDictionary<long, Session>();
+            m_Listeners = new List<Listener>();
 
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
 
@@ -147,9 +138,9 @@ namespace BitBox.Core
         {
             Logger.Info("ServerStart");
 
-            for (var i = 0; i < m_ListenerConfigs.Length; i++)
+            for (var i = 0; i < m_ServerConfig.Listeners.Length; i++)
             {
-                var listener = new Listener(m_ListenerConfigs[i], this);
+                var listener = new Listener(m_ServerConfig.Listeners[i], this);
                 listener.Error += new Listener.ErrorHandler(OnListenerError);
                 listener.Accepted += new Listener.AcceptHandler(OnSessionConnected);
 
@@ -332,13 +323,31 @@ namespace BitBox.Core
             session.ProcessSend(e);
         }
 
-        public virtual void CreateLogger()
+        public virtual bool LoadServerConfig()
+        {
+            try
+            {
+                using (StreamReader sr = File.OpenText(System.IO.Directory.GetCurrentDirectory() + @"\Config\Server.config"))
+                {
+                    XmlSerializer serializer = new XmlSerializer(typeof(ServerConfig));
+                    m_ServerConfig = serializer.Deserialize(sr) as ServerConfig;
+                    return true;
+                }
+            }
+            catch(Exception e)
+            {
+                Logger.Error(e);
+                return false;
+            }
+        }
+
+        public virtual bool CreateLogger()
         {
             List<LoggerBase> loggers = new List<LoggerBase>();
             LoggerBase mainLogger = null;
             if (ExecuteType == ServerExecuteType.Service)
             {
-                LoggerBase logger = new WindowEventLogger { ApplicationName = string.Format("{0} - {1}", ModuleName, m_ServerConfig.Version) };
+                LoggerBase logger = new WindowEventLogger { ApplicationName = string.Format("{0} - {1}", ModuleName, Version) };
                 loggers.Add(logger);
             }
             else
@@ -348,6 +357,8 @@ namespace BitBox.Core
                 mainLogger = logger;
             }
             Logger.Init(mainLogger, loggers);
+
+            return true;
         }
 
         public virtual Session CreateSession(Socket socket, SocketAsyncEventArgs recvSAEA, SocketAsyncEventArgs sendSAEA)

@@ -7,30 +7,32 @@ using System.Threading.Tasks;
 using BitBox.Core;
 using BitBox.Log;
 
-namespace BitBoxAppServerExample
+namespace BitBoxAppServerExample.Scripts
 {
     public class ExampleAppServer : Server
     {
-        public override bool Init(ServerExecuteType executeType)
+        public override bool Init(ServerExecuteType executeType, string version, string name = null)
         {
-            if (base.Init(executeType) == false)
+            if (base.Init(executeType, version, name) == false)
                 return false;
 
             return true;
         }
 
-        public override void CreateLogger()
+        public override bool CreateLogger()
         {
             List<LoggerBase> loggers = new List<LoggerBase>();
             LoggerBase mainLogger = new ConsoleLogger();
             loggers.Add(mainLogger);
             loggers.Add(new FileLogger());
             Logger.Init(mainLogger, loggers);
+
+            return true;
         }
 
         public override Session CreateSession(Socket socket, SocketAsyncEventArgs recvSAEA, SocketAsyncEventArgs sendSAEA)
         {
-            return base.CreateSession(socket, recvSAEA, sendSAEA);
+            return new ExampleSession(this, socket, recvSAEA, sendSAEA);
         }
     }
 }

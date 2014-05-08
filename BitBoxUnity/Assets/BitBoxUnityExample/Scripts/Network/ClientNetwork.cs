@@ -15,7 +15,7 @@ public partial class ClientNetwork : Singleton<ClientNetwork>
 
     private Queue<Packet> m_RecvPacketList;
 
-    void Start()
+    void Awake()
     {
         m_RecvPacketList = new Queue<Packet>();
 
@@ -61,6 +61,6 @@ public partial class ClientNetwork : Singleton<ClientNetwork>
 
     void OnError(string message, Exception e)
     {
-        Debug.Log(string.Format("OnError:{0} {1}", message, e != null ? e.Message : string.Empty));
+        Debug.Log(string.Format("OnError:{0}", e != null ? e.Message : message));
     }
 }

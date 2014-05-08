@@ -5,13 +5,10 @@ namespace BitBoxUnity.Core
 {
     public class WebSession : SessionBase<string>
     {
-        private static readonly int BUFFER_SIZE = 8192;
         private static readonly string CONTENT_LENGTH = "Content-Length";
         private static readonly string CONTENT_TYPE = "Content-Type";
         private static readonly string BINARY_OCTET_STREAM = "binary/octet-stream";
         private static readonly string URL = "http://{0}:{1}/{2}";
-
-        protected byte[] m_RecvBuffer;
 
         public override void Connect(string remoteAddress, int port)
         {
@@ -19,8 +16,6 @@ namespace BitBoxUnity.Core
                 return;
 
             base.Connect(remoteAddress, port);
-
-            m_RecvBuffer = new byte[BUFFER_SIZE];
 
             if (Connected != null)
                 Connected(string.Format("{0}:{1}", RemoteAddress, Port));
@@ -33,8 +28,6 @@ namespace BitBoxUnity.Core
 
             if (Disconnected != null)
                 Disconnected(string.Format("{0}:{1}", RemoteAddress, Port));
-
-            m_RecvBuffer = null;
 
             base.Disconnect();
         }

@@ -1,23 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace BitBox.Core
 {
-    public class ServerConfig : IDisposable
+    public class ServerConfig
     {
-        public string Version { get; set; }
+        public int SendTimeOut;
+        public int SendBufferSize;
+        public int ReceiveBufferSize;
+        public int MaxConnectionNumber;
+        public int MaxAcceptOps;
 
-        public int SendTimeOut { get; set; }
-        public int SendBufferSize { get; set; }
-        public int ReceiveBufferSize { get; set; }
-        public int MaxConnectionNumber { get; set; }
-        public int MaxAcceptOps { get; set; }
+        public int MinWorkerThreads;
+        public int MaxWorkerThreads;
+        public int MinCompletionPortThreads;
+        public int MaxCompletionPortThreads;
 
-        public void Dispose()
+        public class ListenerConfig
         {
+            public string IP;
+            public int Port;
+            public int BackLog;
+            [XmlIgnore]
+            public IPEndPoint EndPoint;
         }
+
+        [XmlArrayItemAttribute("Listener", IsNullable = false)]
+        public ListenerConfig[] Listeners;
     }
 }

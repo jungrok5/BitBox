@@ -40,7 +40,8 @@ namespace BitBoxUnity.Core
             }
             catch (Exception e)
             {
-                Debug.LogError(string.Format("AppSession.ConnectCallback - {0}", e.Message));
+                if (Error != null)
+                    Error(null, e);
             }
         }
 
@@ -94,7 +95,8 @@ namespace BitBoxUnity.Core
             }
             catch (Exception e)
             {
-                Debug.LogError(string.Format("AppSession.ReceiveCallback - {0}", e.Message));
+                if (Error != null)
+                    Error(null, e);
             }
         }
 

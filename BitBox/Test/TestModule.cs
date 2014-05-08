@@ -8,12 +8,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using BitBox.Log;
 using BitBox.Util;
+using BitBox.Core;
+using System.IO;
+using System.Xml.Serialization;
 
 namespace BitBox.Test
 {
-    // 뭐가 어떻게 구성될진 모르겠지만 일단 테스용기능들 넣어둘라고
-    // 나중에 별도로 어트리뷰트 만들어서 자동으로 로드해서 돌리게 해보자
-    // NUnit같은걸 써볼까?
     public static class TestModule
     {
         public static void Start()
@@ -22,7 +22,20 @@ namespace BitBox.Test
             //Test_MiniDump();
             //Test_ThreadLocal();
             //Test_8GB();
-            Test_ThreadDbContext();
+            //Test_ThreadDbContext();
+            Test_Config();
+        }
+
+        static void Test_Config()
+        {
+            //ServerConfigChild config;
+            //using (StreamReader streamReader = File.OpenText(System.IO.Directory.GetCurrentDirectory() + @"\Config\Server.config"))
+            //{
+            //    XmlSerializer serializer = new XmlSerializer(typeof(ServerConfigChild));
+            //    config = serializer.Deserialize(streamReader) as ServerConfigChild;
+            //}
+
+            //Logger.Debug(config.Version);
         }
 
         private static byte[] m_Buffer1;

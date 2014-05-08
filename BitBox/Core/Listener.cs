@@ -19,13 +19,13 @@ namespace BitBox.Core
         public AcceptHandler Accepted;
         public ErrorHandler Error;
 
-        public ListenerConfig m_Config;
+        public ServerConfig.ListenerConfig m_Config;
 
         private Socket m_ListenSocket;
 
         public Server Server;
 
-        public Listener(ListenerConfig listenerConfig, Server server)
+        public Listener(ServerConfig.ListenerConfig listenerConfig, Server server)
         {
             m_Config = listenerConfig;
             Server = server;
@@ -33,7 +33,13 @@ namespace BitBox.Core
 
         public bool Start(ServerConfig serverConfig)
         {
-            m_ListenSocket = new Socket(m_Config.EndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            IPAddress addr;
+            IPAddress.TryParse(m_Config.IP, out addr);
+            if (addr == null)
+                addr = IPAddress.Any;
+            m_Config.EndPoint = new IPEndPoint(addr, m_Config.Port);
+
+            m_ListenSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
             try
             {

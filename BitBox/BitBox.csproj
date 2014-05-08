@@ -82,7 +82,6 @@
     <Compile Include="Log\LoggerBase.cs" />
     <Compile Include="Core\BufferManager.cs" />
     <Compile Include="Core\Listener.cs" />
-    <Compile Include="Core\ListenerConfig.cs" />
     <Compile Include="Core\Server.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -107,11 +106,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Config\Server.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Config\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>

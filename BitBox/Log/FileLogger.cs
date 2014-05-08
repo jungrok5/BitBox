@@ -20,7 +20,7 @@ namespace BitBox.Log
                 Threshold = Level.All,
                 Layout = new PatternLayout(layoutString),
                 // System.IO.Directory.GetCurrentDirectory() 이 값이 ASP.NET에서나 Winform등에서는 다를 수 있음. 다른곳에 가져다 쓰는경우 주의바람
-                File = System.IO.Directory.GetCurrentDirectory() + "\\Log\\Server.log",
+                File = System.IO.Directory.GetCurrentDirectory() + @"\Log\Server.log",
                 AppendToFile = true,
                 RollingStyle = log4net.Appender.RollingFileAppender.RollingMode.Date,
                 LockingModel = new log4net.Appender.FileAppender.MinimalLock(),

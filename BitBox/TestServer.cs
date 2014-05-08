@@ -12,22 +12,24 @@ namespace BitBox
 {
     public class TestServer : Server
     {
-        public override bool Init(ServerExecuteType executeType)
+        public override bool Init(ServerExecuteType executeType, string version, string name = null)
         {
-            if (base.Init(executeType) == false)
+            if (base.Init(executeType, version, name) == false)
                 return false;
 
             TestModule.Start();
             return true;
         }
 
-        public override void CreateLogger()
+        public override bool CreateLogger()
         {
             List<LoggerBase> loggers = new List<LoggerBase>();
             LoggerBase mainLogger = new ConsoleLogger();
             loggers.Add(mainLogger);
             loggers.Add(new FileLogger());
             Logger.Init(mainLogger, loggers);
+
+            return true;
         }
 
         public override Session CreateSession(Socket socket, SocketAsyncEventArgs recvSAEA, SocketAsyncEventArgs sendSAEA)

@@ -14,22 +14,22 @@ namespace BitBox.Core
 {
     public static class ServerExecuter<T> where T : Server, new()
     {
-        public static void Execute(string[] args)
+        public static void Execute(string[] args, string version, string name = null)
         {
             if (System.Environment.UserInteractive)
-                Execute_Console(args);
+                Execute_Console(args, version, name);
             else
-                Execute_Service();
+                Execute_Service(version, name);
         }
 
-        static void Execute_Console(string[] args)
+        static void Execute_Console(string[] args, string version, string name = null)
         {
             T server = new T();
-            server.Init(ServerExecuteType.Console);
+            server.Init(ServerExecuteType.Console, version, name);
 
             Logger.Info("Execute_Console");
 
-            Console.Title = Server.ModuleName;
+            Console.Title = string.Format("{0} v{1}", Server.ModuleName, version);
 
             if (Parse_n_Process_Argument(server, args))
             {
@@ -43,10 +43,10 @@ namespace BitBox.Core
             server.ServerRun();
         }
 
-        static void Execute_Service()
+        static void Execute_Service(string version, string name = null)
         {
             T server = new T();
-            server.Init(ServerExecuteType.Service);
+            server.Init(ServerExecuteType.Service, version, name);
 
             Logger.Info("Execute_Service");
 
