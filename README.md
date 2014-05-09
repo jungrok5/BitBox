@@ -1,7 +1,7 @@
 BitBox
 ======
 
-C# Binary based simple network library
+C# Binary based simple network library.
 https://github.com/jungrok5/BitBox.git
 
 
