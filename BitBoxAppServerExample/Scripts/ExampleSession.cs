@@ -22,32 +22,49 @@ namespace BitBoxAppServerExample.Scripts
 
         protected override void OnReceived(byte[] buffer, int offset, int length)
         {
-            if (length >= Packet.BUFFER_SIZE)
+            if (length >= m_Buffer.Length || m_BufferPos + length >= m_Buffer.Length)
             {
                 OnError("Invalid receive data", null);
                 return;
             }
 
-            Logger.Debug("m_BufferPos:" + m_BufferPos + " length:" + length);
-
             Array.Copy(buffer, offset, m_Buffer, m_BufferPos, length);
             m_BufferPos += length;
 
-            if (m_BufferPos >= Packet.HEADER_SIZE)
+            if (m_BufferPos < Packet.HEADER_SIZE)
+                return;
+
+            int remainSize = m_BufferPos;
+            int readOffset = 0;
+
+            while (remainSize > 0)
             {
-                ushort packetSize = BitConverter.ToUInt16(m_Buffer, Packet.PACKET_SIZE_OFFSET);
-                Logger.Debug("packetSize:" + packetSize);
-                if (packetSize < 0 || packetSize >= Packet.BUFFER_SIZE - Packet.HEADER_SIZE)
+                ushort packetSize = (ushort)(BitConverter.ToUInt16(m_Buffer, readOffset + Packet.PACKET_SIZE_OFFSET) + Packet.HEADER_SIZE);
+                if (packetSize < 0 || packetSize >= Packet.BUFFER_SIZE)
                 {
                     OnError("Invalid receive data", null);
                     return;
                 }
 
-                if (packetSize + Packet.HEADER_SIZE <= m_BufferPos)
+                if (packetSize > remainSize)
+                    break;
+
+                remainSize -= packetSize;
+                readOffset += packetSize;
+
+                base.OnReceived(m_Buffer, readOffset, packetSize);
+            }
+
+            if (readOffset > 0)
+            {
+                if (m_BufferPos > readOffset)
                 {
-                    base.OnReceived(m_Buffer, 0, packetSize + Packet.HEADER_SIZE);
-                    Array.Copy(m_Buffer, packetSize + Packet.HEADER_SIZE, m_Buffer, 0, m_BufferPos - packetSize + Packet.HEADER_SIZE);
-                    m_BufferPos -= packetSize + Packet.HEADER_SIZE;
+                    Array.Copy(m_Buffer, readOffset, m_Buffer, 0, m_BufferPos - readOffset);
+                    m_BufferPos -= readOffset;
+                }
+                else
+                {
+                    m_BufferPos = 0;
                 }
             }
         }

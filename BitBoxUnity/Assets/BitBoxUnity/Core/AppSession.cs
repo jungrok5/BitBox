@@ -119,7 +119,6 @@ namespace BitBoxUnity.Core
             try
             {
                 sentBytes = m_Socket.EndSend(ar);
-                Debug.Log("sentBytes:" + sentBytes);
             }
             catch (Exception e)
             {

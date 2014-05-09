@@ -18,6 +18,7 @@ namespace BitBoxAppServerExample.Scripts
             string data = packet.ReadString();
             long tick = packet.ReadLong();
 
+            Logger.Debug(string.Format("data:{0} tick:{1}", data, tick));
             Send_CS_ECHO_APP_ACK(session, data, tick);
         }
     }

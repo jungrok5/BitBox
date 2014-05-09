@@ -18,6 +18,11 @@ public class Main : MonoBehaviour
         {
             ClientNetwork.Instance.Send_CS_ECHO_APP_REQ("hello world app");
         }
+
+        if (GUILayout.Button("Send twice ECHO APP", GetOption()))
+        {
+            ClientNetwork.Instance.Send_CS_ECHO_APP_REQ_TWICE("hello world app");
+        }
         GUILayout.EndVertical();
     }
 
