@@ -1,7 +1,8 @@
 BitBox
 ======
 
-C# Network library
+C# Binary based simple network library
+https://github.com/jungrok5/BitBox.git
 
 
 BitBox projects are released under the terms of the MIT license.
