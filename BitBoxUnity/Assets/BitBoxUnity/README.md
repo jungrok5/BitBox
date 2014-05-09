@@ -3,14 +3,11 @@ BitBoxUnity
 BitBox for Unity
 
 
-Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
 
-http://www.apache.org/licenses/LICENSE-2.0
+BitBox projects are released under the terms of the MIT license.
 
-Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and limitations under the License.
+The MIT License is simple and easy to understand and it places almost no restrictions on what you can do with a BitBox project.
 
+You are free to use any BitBox project in any other project (even commercial projects) as long as the copyright header is left intact.
 
 Copyright 2014 Jeongrok Oh (jungrok5@gmail.com)
