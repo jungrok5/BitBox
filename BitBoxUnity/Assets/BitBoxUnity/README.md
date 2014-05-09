@@ -1,9 +1,10 @@
-BitBoxUnity
-=================================
-BitBox for Unity
+# BitBoxUnity
+BitBox client for Unity
 
+## Download
+https://github.com/jungrok5/BitBox.git
 
-
+## License
 BitBox projects are released under the terms of the MIT license.
 
 The MIT License is simple and easy to understand and it places almost no restrictions on what you can do with a BitBox project.
