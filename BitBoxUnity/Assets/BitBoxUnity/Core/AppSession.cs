@@ -2,12 +2,13 @@
 using System.Collections;
 using System.Net.Sockets;
 using System;
+using System.Collections.Generic;
 
 namespace BitBoxUnity.Core
 {
     public class AppSession : SessionBase<ushort>
     {
-        private static readonly int BUFFER_SIZE = 8192;
+        protected static readonly int BUFFER_SIZE = 8192;
 
         protected Socket m_Socket;
         protected byte[] m_RecvBuffer;
@@ -33,15 +34,13 @@ namespace BitBoxUnity.Core
                 socket.EndConnect(ar);
                 m_Socket = socket;
 
-                if (Connected != null)
-                    Connected(string.Format("{0}:{1}", RemoteAddress, Port));
+                OnConnected(string.Format("{0}:{1}", RemoteAddress, Port));
 
                 m_Socket.BeginReceive(m_RecvBuffer, 0, BUFFER_SIZE, 0, ReceiveCallback, null);
             }
             catch (Exception e)
             {
-                if (Error != null)
-                    Error(null, e);
+                OnError(null, e);
             }
         }
 
@@ -50,8 +49,7 @@ namespace BitBoxUnity.Core
             if (IsConnected() == false)
                 return;
 
-            if (Disconnected != null)
-                Disconnected(string.Format("{0}:{1}", RemoteAddress, Port));
+            OnDisconnected(string.Format("{0}:{1}", RemoteAddress, Port));
 
             m_Socket.Shutdown(SocketShutdown.Both);
             m_Socket.Close();
@@ -86,17 +84,14 @@ namespace BitBoxUnity.Core
                     return;
                 }
 
-                // TODO 패킷받은 처리. 여기서 id를 꺼내서 넘겨줘야한다
-                // 패킷객체 생성해서 핸들러로 패스
-                if (Received != null)
-                    Received(m_RecvBuffer, 0, receivedBytes);
+                // 이 이벤트를 받는쪽에서는 패킷이 잘려서 오는것에 대한 처리를 해야한다
+                OnReceived(m_RecvBuffer, 0, receivedBytes);
 
                 m_Socket.BeginReceive(m_RecvBuffer, 0, BUFFER_SIZE, 0, ReceiveCallback, null);
             }
             catch (Exception e)
             {
-                if (Error != null)
-                    Error(null, e);
+                OnError(null, e);
             }
         }
 
@@ -105,12 +100,34 @@ namespace BitBoxUnity.Core
             if (IsConnected() == false)
                 return;
 
-            base.Send(id, buffer, offset, length);
-
-            // TODO id값을 맨앞단에 사이즈와 함께 넣어야한다
+            try
+            {
+                m_Socket.BeginSend(buffer, offset, length, 0, SendCallback, null);
+            }
+            catch (Exception e)
+            {
+                OnError(null, e);
+            }
         }
 
-        public override void Update()
+        private void SendCallback(IAsyncResult ar)
+        {
+             if (IsConnected() == false)
+                return;
+
+            int sentBytes = 0;
+            try
+            {
+                sentBytes = m_Socket.EndSend(ar);
+                Debug.Log("sentBytes:" + sentBytes);
+            }
+            catch (Exception e)
+            {
+                OnError(null, e);
+            }
+        }
+
+        protected override void Update()
         {
             base.Update();
         }

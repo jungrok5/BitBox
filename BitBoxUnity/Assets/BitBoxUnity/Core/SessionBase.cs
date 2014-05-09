@@ -11,7 +11,7 @@ namespace BitBoxUnity.Core
     // TODO
     // 요녀석이 완성되면 이녀석을 기반으로 포톤이나 유니티빌트인네트워크처럼 RPC 느낌으로 호출하는거 예제로 만들어보자 RPC("OnXX")이렇게하면 서버쪽에서 응답하는것까지도 ㅋ
 
-    public class SessionBase<TIDType> : MonoBehaviour
+    public class SessionBase<TIDType> : MonoBehaviour 
     {
         public delegate void ConnectHandler(string endpoint);
         public delegate void DisconnectHandler(string endpoint);
@@ -47,8 +47,32 @@ namespace BitBoxUnity.Core
         {
         }
 
-        public virtual void Update()
+        protected virtual void Update()
         {
+        }
+
+        protected virtual void OnConnected(string endpoint)
+        {
+            if (Connected != null)
+                Connected(endpoint);
+        }
+
+        protected virtual void OnDisconnected(string endpoint)
+        {
+            if (Disconnected != null)
+                Disconnected(endpoint);
+        }
+
+        protected virtual void OnReceived(byte[] buffer, int offset, int length)
+        {
+            if (Received != null)
+                Received(buffer, offset, length);
+        }
+
+        protected virtual void OnError(string message, Exception e)
+        {
+            if (Error != null)
+                Error(message, e);
         }
     }
 }

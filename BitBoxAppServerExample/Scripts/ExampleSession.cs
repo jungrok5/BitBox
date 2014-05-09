@@ -14,5 +14,10 @@ namespace BitBoxAppServerExample.Scripts
             : base(server, socket, recvSAEA, sendSAEA)
         {
         }
+
+        protected override void OnReceived(byte[] buffer, int offset, int length)
+        {
+            base.OnReceived(buffer, offset, length);
+        }
     }
 }

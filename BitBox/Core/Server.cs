@@ -263,7 +263,7 @@ namespace BitBox.Core
                 return null;
             }
 
-            session.Closed += OnSessionDisconnected;
+            session.Disconnected += OnSessionDisconnected;
 
             long sessionID = GenerateSessionID();
             session.SetSessionID(sessionID);

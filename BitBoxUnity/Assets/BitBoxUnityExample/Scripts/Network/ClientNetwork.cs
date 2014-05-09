@@ -10,8 +10,8 @@ public partial class ClientNetwork : Singleton<ClientNetwork>
 {
     private static readonly string STRING_FORMAT_RECV = "On_{0}";
 
-    private AppSession m_AppSession;
-    private WebSession m_WebSession;
+    private ExampleAppSession m_AppSession;
+    private ExampleWebSession m_WebSession;
 
     private Queue<Packet> m_RecvPacketList;
 
@@ -23,7 +23,7 @@ public partial class ClientNetwork : Singleton<ClientNetwork>
         CreateSession_App();
 
         ConnectSession_Web("localhost", 57778);
-        //ConnectSession_App("localhost", 12345);
+        ConnectSession_App("localhost", 11110);
     }
 
     void ReceiveHandler(Packet packet)

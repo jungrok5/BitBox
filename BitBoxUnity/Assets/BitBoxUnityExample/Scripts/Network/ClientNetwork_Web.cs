@@ -11,7 +11,7 @@ public partial class ClientNetwork : Singleton<ClientNetwork>
     public void CreateSession_Web()
     {
         GameObject go = new GameObject("WebSession");
-        m_WebSession = go.AddComponent<WebSession>();
+        m_WebSession = go.AddComponent<ExampleWebSession>();
 
         m_WebSession.Connected += OnConnect;
         m_WebSession.Disconnected += OnDisconnect;
@@ -31,7 +31,7 @@ public partial class ClientNetwork : Singleton<ClientNetwork>
         if (m_WebSession == null)
             return;
 
-        m_WebSession.Send(((ProtocolID)packet.GetID()).ToString(), packet.m_pData, 0, (ushort)packet.GetTotalPacketSize());
+        m_WebSession.Send(packet);
     }
 
     void OnReceive_Web(byte[] buffer, int offset, int length)

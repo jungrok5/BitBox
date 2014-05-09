@@ -4,14 +4,20 @@ using System.Collections.Generic;
 using BitBoxUnity.Core;
 using System.Reflection;
 using BitBoxExample.CSCommon;
+using System;
 
 public partial class ClientNetwork : Singleton<ClientNetwork>
 {
     public void Send_CS_ECHO_WEB_REQ(string data)
     {
-        Debug.Log(string.Format("SEND to Server:{0}", data));
         Packet packet = new Packet((ushort)ProtocolID.CS_ECHO_WEB_REQ);
         packet.WriteString(data);
+
+        long tick = DateTime.Now.Ticks;
+        packet.WriteLong(tick);
+
+        Debug.Log(string.Format("SEND to Server:{0}[{1}]", data, tick));
+
         SendPacket_Web(packet);
     }
 }

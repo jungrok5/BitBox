@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
@@ -11,6 +12,8 @@ namespace BitBoxAppServerExample.Scripts
 {
     public class ExampleAppServer : Server
     {
+        private ConcurrentDictionary<long, ExampleSession> m_Clients = new ConcurrentDictionary<long, ExampleSession>();
+
         public override bool Init(ServerExecuteType executeType, string version, string name = null)
         {
             if (base.Init(executeType, version, name) == false)

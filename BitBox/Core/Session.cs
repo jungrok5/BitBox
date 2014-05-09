@@ -25,8 +25,15 @@ namespace BitBox.Core
         public long m_ID;
         public Server Server;
 
-        public delegate void CloseHandler(Session session, CloseReason reason);
-        public CloseHandler Closed;
+        public delegate void ConnectHandler();
+        public delegate void DisconnectHandler(Session session, CloseReason reason);
+        public delegate void ReceiveHandler(byte[] buffer, int offset, int length);
+        public delegate void ErrorHandler(string message, Exception e);
+
+        public ConnectHandler Connected;
+        public DisconnectHandler Disconnected;
+        public ReceiveHandler Received;
+        public ErrorHandler Error;
 
         private Socket m_Socket;
         public SocketAsyncEventArgs m_RecvSAEA;
@@ -92,11 +99,7 @@ namespace BitBox.Core
 
             if (e.BytesTransferred > 0 && e.SocketError == SocketError.Success)
             {
-                // TODO
-                // 여기에 HandleReceive 같은 호출이 이뤄지면 된다
-
-                // TEST 테스트로 받은 데이터를 그대로 넘기자
-                Send(e.Buffer, e.Offset, e.BytesTransferred);
+                OnReceived(e.Buffer, e.Offset, e.BytesTransferred);
             }
             else
             {
@@ -146,7 +149,7 @@ namespace BitBox.Core
                     m_SendingList.Add(arraySeg);
                 }
                 m_SendSAEA.BufferList = m_SendingList;
-                
+
                 pending = m_Socket.SendAsync(m_SendSAEA);
 
                 // pending값이 false라면 동기적으로 처리가 완료되서 여기서 바로 처리해줘야함
@@ -237,13 +240,36 @@ namespace BitBox.Core
 
                 Server = null;
 
-                if (Closed != null)
-                    Closed(this, CloseReason.Unknown);
+                OnDisconnected(this, CloseReason.Unknown);
             }
         }
 
         public virtual void Dispose()
         {
+        }
+
+        protected virtual void OnConnected()
+        {
+            if (Connected != null)
+                Connected();
+        }
+
+        protected virtual void OnDisconnected(Session session, CloseReason reason)
+        {
+            if (Disconnected != null)
+                Disconnected(session, reason);
+        }
+
+        protected virtual void OnReceived(byte[] buffer, int offset, int length)
+        {
+            if (Received != null)
+                Received(buffer, offset, length);
+        }
+
+        protected virtual void OnError(string message, Exception e)
+        {
+            if (Error != null)
+                Error(message, e);
         }
     }
 }

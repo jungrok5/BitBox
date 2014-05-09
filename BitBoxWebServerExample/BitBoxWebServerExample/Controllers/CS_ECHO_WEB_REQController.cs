@@ -11,16 +11,16 @@ namespace BitBoxWebServerExample.Controllers
 {
     public class CS_ECHO_WEB_REQController : Controller
     {
-        [HttpPost]
         public BinaryResult ProcessReceive(Packet recvPacket)
         {
             string data = recvPacket.ReadString();
+            long tick = recvPacket.ReadLong();
 
             Packet sendPacket = new Packet((ushort)ProtocolID.CS_ECHO_WEB_ACK);
-            sendPacket.WriteString(data); // echo
+            sendPacket.WriteString(data);
+            sendPacket.WriteLong(tick);
 
             return new PacketResult(sendPacket);
         }
-
     }
 }

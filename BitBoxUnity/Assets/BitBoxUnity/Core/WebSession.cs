@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 namespace BitBoxUnity.Core
 {
@@ -16,9 +17,7 @@ namespace BitBoxUnity.Core
                 return;
 
             base.Connect(remoteAddress, port);
-
-            if (Connected != null)
-                Connected(string.Format("{0}:{1}", RemoteAddress, Port));
+            OnConnected(string.Format("{0}:{1}", RemoteAddress, Port));
         }
 
         public override void Disconnect()
@@ -26,9 +25,7 @@ namespace BitBoxUnity.Core
             if (IsConnected() == false)
                 return;
 
-            if (Disconnected != null)
-                Disconnected(string.Format("{0}:{1}", RemoteAddress, Port));
-
+            OnDisconnected(string.Format("{0}:{1}", RemoteAddress, Port));
             base.Disconnect();
         }
 
@@ -43,13 +40,11 @@ namespace BitBoxUnity.Core
 
             if (www.error == null)
             {
-                if (Received != null)
-                    Received(www.bytes, 0, www.bytes.Length);
+                OnReceived(www.bytes, 0, www.bytes.Length);
             }
             else
             {
-                if (Error != null)
-                    Error(www.error, null);
+                OnError(www.error, null);
             }
 
             www.Dispose();
@@ -60,18 +55,18 @@ namespace BitBoxUnity.Core
             if (IsConnected() == false)
                 return;
 
-            base.Send(id, buffer, offset, length);
-
-            // [주의]
             // 유니티의 WWW클래스는 아래 인자로 넣어주는 buffer의 사이즈를 Content-Length로 넘겨버리기 때문에
-            // buffer에는 넘겨주려는 데이터만 담겨있어야한다
+            // buffer에는 넘겨주려는 데이터만 담겨있어야한다 (클라이언트긴 하지만 그래도 WWW쓰지말고 직접 만드는게 나을까? 일단 구현하고 테스트후에 다시한번보자)
+            byte[] sendBuffer = new byte[length];
+            Array.Copy(buffer, offset, sendBuffer, 0, length);
+
             Hashtable headers = new Hashtable();
             headers.Add(CONTENT_LENGTH, length);
             headers.Add(CONTENT_TYPE, BINARY_OCTET_STREAM);
-            StartCoroutine(ReceiveCallback(new WWW(string.Format(URL, RemoteAddress, Port, id), buffer, headers)));
+            StartCoroutine(ReceiveCallback(new WWW(string.Format(URL, RemoteAddress, Port, id), sendBuffer, headers)));
         }
 
-        public override void Update()
+        protected override void Update()
         {
             base.Update();
         }

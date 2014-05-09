@@ -11,7 +11,7 @@ public partial class ClientNetwork : Singleton<ClientNetwork>
     public void CreateSession_App()
     {
         GameObject go = new GameObject("AppSession");
-        m_AppSession = go.AddComponent<AppSession>();
+        m_AppSession = go.AddComponent<ExampleAppSession>();
 
         m_AppSession.Connected += OnConnect;
         m_AppSession.Disconnected += OnDisconnect;
@@ -31,12 +31,12 @@ public partial class ClientNetwork : Singleton<ClientNetwork>
         if (m_AppSession == null)
             return;
 
-        m_AppSession.Send(packet.GetID(), packet.m_pData, 0, (ushort)packet.GetTotalPacketSize());
+        m_AppSession.Send(packet);
     }
 
     void OnReceive_App(byte[] buffer, int offset, int length)
     {
-        Debug.Log(string.Format("OnReceive_Web:{0}", length));
+        Debug.Log(string.Format("OnReceive_App:{0}", length));
 
         Packet recvPacket = new Packet(buffer, length);
         lock (m_RecvPacketList)
