@@ -53,6 +53,12 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Scripts\ExampleAppServer_CS_Recv.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Scripts\ExampleAppServer_CS_Send.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Scripts\ExampleSession.cs" />
   </ItemGroup>
   <ItemGroup>

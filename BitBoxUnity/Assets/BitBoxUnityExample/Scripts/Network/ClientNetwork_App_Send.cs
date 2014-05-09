@@ -10,7 +10,7 @@ public partial class ClientNetwork : Singleton<ClientNetwork>
 {
     public void Send_CS_ECHO_APP_REQ(string data)
     {
-        Packet packet = new Packet((ushort)ProtocolID.CS_ECHO_APP_REQ);
+        Packet packet = new Packet(ProtocolID.CS_ECHO_APP_REQ);
         packet.WriteString(data);
 
         long tick = DateTime.Now.Ticks;

@@ -11,7 +11,7 @@ namespace BitBoxWebServerExample.Scripts.Core
     {
         public PacketResult(Packet packet)
         {
-            Data = new ArraySegment<byte>(packet.m_pData, 0, packet.GetTotalPacketSize());
+            Data = new ArraySegment<byte>(packet.GetData(), 0, packet.GetTotalPacketSize());
         }
     }
 }

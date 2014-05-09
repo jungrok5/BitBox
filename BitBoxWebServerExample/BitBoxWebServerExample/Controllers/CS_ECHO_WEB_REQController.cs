@@ -16,7 +16,7 @@ namespace BitBoxWebServerExample.Controllers
             string data = recvPacket.ReadString();
             long tick = recvPacket.ReadLong();
 
-            Packet sendPacket = new Packet((ushort)ProtocolID.CS_ECHO_WEB_ACK);
+            Packet sendPacket = new Packet(ProtocolID.CS_ECHO_WEB_ACK);
             sendPacket.WriteString(data);
             sendPacket.WriteLong(tick);
 

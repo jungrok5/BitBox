@@ -142,7 +142,7 @@ namespace BitBox.Core
             {
                 var listener = new Listener(m_ServerConfig.Listeners[i], this);
                 listener.Error += new Listener.ErrorHandler(OnListenerError);
-                listener.Accepted += new Listener.AcceptHandler(OnSessionConnected);
+                listener.Accepted += new Listener.AcceptHandler(OnSessionAccepted);
 
                 if (listener.Start(m_ServerConfig))
                 {
@@ -224,74 +224,6 @@ namespace BitBox.Core
             }
         }
 
-        protected virtual void OnSessionConnected(Listener listener, Socket socket)
-        {
-            if (IsStopped)
-                return;
-
-            ProcessSessionConnected(socket);
-        }
-
-        protected virtual Session ProcessSessionConnected(Socket socket)
-        {
-            // TODO 여기서 동접 체크?
-
-            SocketAsyncEventArgs recvSAEA;
-            if (!m_RecvSAEAPool.TryPop(out recvSAEA))
-            {
-                Task.Run(() => { socket.CloseEx(); });
-                Logger.Error(string.Format("Max connection number {0} was reached!", m_ServerConfig.MaxConnectionNumber));
-                return null;
-            }
-
-            SocketAsyncEventArgs sendSAEA;
-            if (!m_SendSAEAPool.TryPop(out sendSAEA))
-            {
-                Task.Run(() => { socket.CloseEx(); });
-                Logger.Error(string.Format("Max connection number {0} was reached!", m_ServerConfig.MaxConnectionNumber));
-                return null;
-            }
-
-            Session session = CreateSession(socket, recvSAEA, sendSAEA);
-            if (session == null)
-            {
-                recvSAEA.UserToken = null;
-                sendSAEA.UserToken = null;
-                m_RecvSAEAPool.Push(recvSAEA);
-                m_SendSAEAPool.Push(sendSAEA);
-                Task.Run(() => { socket.CloseEx(); });
-                return null;
-            }
-
-            session.Disconnected += OnSessionDisconnected;
-
-            long sessionID = GenerateSessionID();
-            session.SetSessionID(sessionID);
-            m_Sessions.TryAdd(sessionID, session);
-
-            // TODO
-            session.StartReceive();
-
-            Logger.Debug(string.Format("OnSessionConnected:{0}", session.m_ID));
-            return session;
-        }
-
-        protected virtual void OnSessionDisconnected(Session session, CloseReason reason)
-        {
-            Logger.Debug(string.Format("OnSessionDisconnected:{0}", session.m_ID));
-            if (session != null && m_RecvSAEAPool != null && m_SendSAEAPool != null)
-            {
-                session.m_RecvSAEA.UserToken = null;
-                session.m_SendSAEA.UserToken = null;
-                // TODO 버퍼 셋팅도 다시 해줘야 하나?
-                // 최초 BufferManager에서 할당받은 위치겠지만 
-                m_RecvSAEAPool.Push(session.m_RecvSAEA);
-                m_SendSAEAPool.Push(session.m_SendSAEA);
-            }
-            Session removeSession = null;
-            m_Sessions.TryRemove(session.m_ID, out removeSession);
-        }
-
         void OnListenerError(Listener listener, Exception e)
         {
             Logger.Error(string.Format("Listener ({0}) error: {1}", listener.m_Config.EndPoint, e.Message), e);
@@ -359,28 +291,6 @@ namespace BitBox.Core
             Logger.Init(mainLogger, loggers);
 
             return true;
-        }
-
-        public virtual Session CreateSession(Socket socket, SocketAsyncEventArgs recvSAEA, SocketAsyncEventArgs sendSAEA)
-        {
-            if (m_ServerConfig.SendTimeOut > 0)
-                socket.SendTimeout = m_ServerConfig.SendTimeOut;
-
-            if (m_ServerConfig.ReceiveBufferSize > 0)
-                socket.ReceiveBufferSize = m_ServerConfig.ReceiveBufferSize;
-
-            if (m_ServerConfig.SendBufferSize > 0)
-                socket.SendBufferSize = m_ServerConfig.SendBufferSize;
-
-            socket.NoDelay = true;
-            socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.DontLinger, true);
-
-            return new Session(this, socket, recvSAEA, sendSAEA);
-        }
-
-        public virtual long GenerateSessionID()
-        {
-            return KeyGenerator.Alloc();
         }
 
         protected override void Dispose(bool disposing)

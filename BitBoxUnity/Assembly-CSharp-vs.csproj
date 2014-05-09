@@ -47,8 +47,6 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\BitBoxUnity\Core\AppSession.cs" />
-     <Compile Include="Assets\BitBoxUnity\Core\RequestBase.cs" />
-     <Compile Include="Assets\BitBoxUnity\Core\ResponseBase.cs" />
      <Compile Include="Assets\BitBoxUnity\Core\SessionBase.cs" />
      <Compile Include="Assets\BitBoxUnity\Core\WebSession.cs" />
      <Compile Include="Assets\BitBoxUnityExample\CSCommon\CSProtocol.cs" />
@@ -62,8 +60,6 @@
      <Compile Include="Assets\BitBoxUnityExample\Scripts\Network\ClientNetwork_Web_Recv.cs" />
      <Compile Include="Assets\BitBoxUnityExample\Scripts\Network\ClientNetwork_Web_Send.cs" />
      <Compile Include="Assets\BitBoxUnityExample\Scripts\Network\Core\ExampleAppSession.cs" />
-     <Compile Include="Assets\BitBoxUnityExample\Scripts\Network\Core\ExampleRequest.cs" />
-     <Compile Include="Assets\BitBoxUnityExample\Scripts\Network\Core\ExampleResponse.cs" />
      <Compile Include="Assets\BitBoxUnityExample\Scripts\Network\Core\ExampleWebSession.cs" />
      <Compile Include="Assets\BitBoxUnityExample\Scripts\Util\Singleton.cs" />
   </ItemGroup>

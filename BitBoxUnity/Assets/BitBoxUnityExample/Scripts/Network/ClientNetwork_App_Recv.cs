@@ -7,8 +7,7 @@ using BitBoxExample.CSCommon;
 
 public partial class ClientNetwork : Singleton<ClientNetwork>
 {
-    // TODO 일단 서버가 그대로 에코중이라서 _ACK가 아니라 _REQ다
-    void On_CS_ECHO_APP_REQ(Packet packet)
+    void On_CS_ECHO_APP_ACK(Packet packet)
     {
         string data = packet.ReadString();
         long tick = packet.ReadLong();

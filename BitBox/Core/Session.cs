@@ -25,10 +25,10 @@ namespace BitBox.Core
         public long m_ID;
         public Server Server;
 
-        public delegate void ConnectHandler();
+        public delegate void ConnectHandler(Session session);
         public delegate void DisconnectHandler(Session session, CloseReason reason);
-        public delegate void ReceiveHandler(byte[] buffer, int offset, int length);
-        public delegate void ErrorHandler(string message, Exception e);
+        public delegate void ReceiveHandler(Session session, byte[] buffer, int offset, int length);
+        public delegate void ErrorHandler(Session session, string message, Exception e);
 
         public ConnectHandler Connected;
         public DisconnectHandler Disconnected;
@@ -55,6 +55,8 @@ namespace BitBox.Core
             m_SendSAEA = sendSAEA;
             m_RecvSAEA.UserToken = this;
             m_SendSAEA.UserToken = this;
+
+            //OnConnected();
         }
 
         public void SetSessionID(long id)
@@ -86,7 +88,7 @@ namespace BitBox.Core
             }
             catch (Exception e)
             {
-                Logger.Error("StartReceive", e);
+                OnError("StartReceive", e);
                 flagReceiving.ForceFalse();
                 Disconnect();
                 return;
@@ -160,7 +162,7 @@ namespace BitBox.Core
             }
             catch (Exception e)
             {
-                Logger.Error("StartReceive", e);
+                OnError("StartReceive", e);
                 flagSending.ForceFalse();
                 Disconnect();
                 return;
@@ -240,7 +242,7 @@ namespace BitBox.Core
 
                 Server = null;
 
-                OnDisconnected(this, CloseReason.Unknown);
+                OnDisconnected(CloseReason.Unknown);
             }
         }
 
@@ -251,25 +253,25 @@ namespace BitBox.Core
         protected virtual void OnConnected()
         {
             if (Connected != null)
-                Connected();
+                Connected(this);
         }
 
-        protected virtual void OnDisconnected(Session session, CloseReason reason)
+        protected virtual void OnDisconnected(CloseReason reason)
         {
             if (Disconnected != null)
-                Disconnected(session, reason);
+                Disconnected(this, reason);
         }
 
         protected virtual void OnReceived(byte[] buffer, int offset, int length)
         {
             if (Received != null)
-                Received(buffer, offset, length);
+                Received(this, buffer, offset, length);
         }
 
         protected virtual void OnError(string message, Exception e)
         {
             if (Error != null)
-                Error(message, e);
+                Error(this, message, e);
         }
     }
 }

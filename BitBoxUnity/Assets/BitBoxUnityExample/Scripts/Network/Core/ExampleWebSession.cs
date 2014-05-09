@@ -7,6 +7,6 @@ public class ExampleWebSession : WebSession
 {
     public void Send(Packet packet)
     {
-        Send(((ProtocolID)packet.GetID()).ToString(), packet.m_pData, 0, packet.GetTotalPacketSize());
+        Send(packet.GetID().ToString(), packet.GetData(), 0, packet.GetTotalPacketSize());
     }
 }
