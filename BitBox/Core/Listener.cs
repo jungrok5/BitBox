@@ -70,7 +70,7 @@ namespace BitBox.Core
             }
         }
 
-        public bool StartAccept()
+        bool StartAccept()
         {
             SocketAsyncEventArgs acceptSAEA;
 

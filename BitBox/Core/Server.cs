@@ -27,15 +27,16 @@ namespace BitBox.Core
         public string Name { get; protected set; }
         public string Version { get; protected set; }
 
-        public bool IsRunning { get; set; }
-        public bool IsStopped { get; set; }
+        protected bool IsRunning { get; set; }
+        protected bool IsStopped { get; set; }
 
         public ServerConfig m_ServerConfig;
-        public List<Listener> m_Listeners;
+        protected List<Listener> m_Listeners;
+        protected Connector m_Connector;
 
         private ConcurrentDictionary<long, Session> m_Sessions;
 
-        public BufferManager m_BufferManager;
+        protected BufferManager m_BufferManager;
         public PooledBufferManager m_PooledBufferManager;
 
         public ConcurrentStack<SocketAsyncEventArgs> m_AcceptSAEAPool;
@@ -72,6 +73,8 @@ namespace BitBox.Core
             m_Listeners = new List<Listener>();
 
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
+
+            m_Connector = new Connector(this);
 
             try
             {
