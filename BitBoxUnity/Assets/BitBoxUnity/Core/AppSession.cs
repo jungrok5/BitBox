@@ -118,6 +118,7 @@ namespace BitBoxUnity.Core
             int sentBytes = 0;
             try
             {
+                // TODO 보낸만큼 가지 않았다면 다시 보내야 할텐데
                 sentBytes = m_Socket.EndSend(ar);
             }
             catch (Exception e)

@@ -171,6 +171,8 @@ namespace BitBox.Core
 
         public void ProcessSend(SocketAsyncEventArgs e)
         {
+            // TODO 보낸만큼 가지 않았다면 다시 보내야 할텐데
+
             if (e.BufferList != null)
             {
                 if (e.BufferList.Count != m_SendingList.Count)

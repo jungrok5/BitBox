@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading;
 using BitBox.Log;
 
+// http://dev.naver.com/scm/viewvc.php/trunk/NetService/Util/PooledBufferManager.cs?view=markup&revision=2&root=netservice
+
 namespace BitBox.Util
 {
     public interface IBufferManager
