@@ -7,6 +7,8 @@ using System.Threading;
 using BitBox.Log;
 
 // http://dev.naver.com/scm/viewvc.php/trunk/NetService/Util/PooledBufferManager.cs?view=markup&revision=2&root=netservice
+// http://referencesource.microsoft.com/#System.ServiceModel.Internals/System/Runtime/InternalBufferManager.cs#9c1494b6c336b69e
+// http://www.dotnetframework.org/default.aspx/WCF/WCF/3@5@30729@1/untmp/Orcas/SP/ndp/cdf/src/WCF/ServiceModel/System/ServiceModel/Channels/BufferManager@cs/1/BufferManager@cs
 
 namespace BitBox.Util
 {
