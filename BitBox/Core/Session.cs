@@ -55,8 +55,6 @@ namespace BitBox.Core
             m_SendSAEA = sendSAEA;
             m_RecvSAEA.UserToken = this;
             m_SendSAEA.UserToken = this;
-
-            //OnConnected();
         }
 
         public void SetSessionID(long id)

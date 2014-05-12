@@ -26,7 +26,7 @@ namespace BitBox.Core
             Server = server;
         }
 
-        public void StartConnect(string remoteAddress, int port, int retry)
+        public void StartConnect(string remoteAddress, int port, int retry = 0)
         {
             Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             socket.BeginConnect(remoteAddress, port, CompletedConnect, socket);

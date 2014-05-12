@@ -27,12 +27,11 @@ namespace BitBox.Core
         public string Name { get; protected set; }
         public string Version { get; protected set; }
 
-        protected bool IsRunning { get; set; }
-        protected bool IsStopped { get; set; }
+        public AtomicBool Stopped { get; set; }
+        public AtomicBool Running { get; set; }
 
         public ServerConfig m_ServerConfig;
         protected List<Listener> m_Listeners;
-        protected Connector m_Connector;
 
         private ConcurrentDictionary<long, Session> m_Sessions;
 
@@ -46,10 +45,12 @@ namespace BitBox.Core
         public static string ModuleName;
         protected ServerExecuteType ExecuteType;
 
+        protected TimerThread m_Updater;
+
         public virtual bool Init(ServerExecuteType executeType, string version, string name = null)
         {
-            IsRunning = false;
-            IsStopped = false;
+            Running = new AtomicBool();
+            Stopped = new AtomicBool();
 
             ExecuteType = executeType;
             Name = string.IsNullOrEmpty(name) == true ? Process.GetCurrentProcess().ProcessName : name;
@@ -73,8 +74,6 @@ namespace BitBox.Core
             m_Listeners = new List<Listener>();
 
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
-
-            m_Connector = new Connector(this);
 
             try
             {
@@ -128,6 +127,8 @@ namespace BitBox.Core
                     return false;
                 }
 
+                m_Updater = new TimerThread(Update, null, 1);
+
                 return true;
             }
             catch (Exception e)
@@ -135,6 +136,10 @@ namespace BitBox.Core
                 Logger.Error("Server.Init", e);
                 return false;
             }
+        }
+
+        public virtual void Update(object context)
+        {
         }
 
         public virtual bool ServerStart()
@@ -167,64 +172,59 @@ namespace BitBox.Core
                 }
             }
 
-            IsRunning = true;
+            Running.ForceTrue();
             return true;
         }
 
         public virtual void ServerStop()
         {
-            Logger.Info("ServerStop");
-
-            if (IsStopped)
+            if (Stopped.SetTrue() == false)
                 return;
 
-            lock (this)
+            Logger.Info("ServerStop");
+
+            for (var i = 0; i < m_Listeners.Count; i++)
             {
-                if (IsStopped)
-                    return;
+                var listener = m_Listeners[i];
 
-                IsStopped = true;
-
-                for (var i = 0; i < m_Listeners.Count; i++)
-                {
-                    var listener = m_Listeners[i];
-
-                    listener.Stop();
-                }
-
-                m_Listeners.Clear();
-
-                SocketAsyncEventArgs eventArgs;
-                while (m_RecvSAEAPool.Count > 0)
-                {
-                    if (m_RecvSAEAPool.TryPop(out eventArgs))
-                        eventArgs.Dispose();
-                }
-                while (m_SendSAEAPool.Count > 0)
-                {
-                    if (m_SendSAEAPool.TryPop(out eventArgs))
-                        eventArgs.Dispose();
-                }
-                while (m_AcceptSAEAPool.Count > 0)
-                {
-                    if (m_AcceptSAEAPool.TryPop(out eventArgs))
-                        eventArgs.Dispose();
-                }
-                m_RecvSAEAPool = null;
-                m_SendSAEAPool = null;
-                m_AcceptSAEAPool = null;
-                m_BufferManager = null;
-                IsRunning = false;
-
-                m_MainThreadStopEvent.Set();
-                m_MainThreadStopEvent.Close();
-                m_MainThreadStopEvent.Dispose();
-                m_MainThreadStopEvent = null;
-
-                Thread.Sleep(100);
-
-                m_MainThread = null;
+                listener.Stop();
             }
+
+            m_Listeners.Clear();
+
+            SocketAsyncEventArgs eventArgs;
+            while (m_RecvSAEAPool.Count > 0)
+            {
+                if (m_RecvSAEAPool.TryPop(out eventArgs))
+                    eventArgs.Dispose();
+            }
+            while (m_SendSAEAPool.Count > 0)
+            {
+                if (m_SendSAEAPool.TryPop(out eventArgs))
+                    eventArgs.Dispose();
+            }
+            while (m_AcceptSAEAPool.Count > 0)
+            {
+                if (m_AcceptSAEAPool.TryPop(out eventArgs))
+                    eventArgs.Dispose();
+            }
+            m_RecvSAEAPool = null;
+            m_SendSAEAPool = null;
+            m_AcceptSAEAPool = null;
+            m_BufferManager = null;
+
+            Running.ForceFalse();
+
+            m_MainThreadStopEvent.Set();
+            m_MainThreadStopEvent.Close();
+            m_MainThreadStopEvent.Dispose();
+            m_MainThreadStopEvent = null;
+
+            m_Updater.Stop();
+
+            Thread.Sleep(100);
+
+            m_MainThread = null;
         }
 
         void OnListenerError(Listener listener, Exception e)
@@ -300,8 +300,8 @@ namespace BitBox.Core
         {
             if (disposing)
             {
-                if (IsRunning)
-                    Stop();
+                if (Running.IsTrue())
+                    ServerStop();
             }
 
             base.Dispose(disposing);

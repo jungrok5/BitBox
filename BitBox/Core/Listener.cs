@@ -72,6 +72,9 @@ namespace BitBox.Core
 
         bool StartAccept()
         {
+            if (Server == null || Server.Stopped.IsTrue())
+                return false;
+
             SocketAsyncEventArgs acceptSAEA;
 
             if (!Server.m_AcceptSAEAPool.TryPop(out acceptSAEA))
@@ -108,6 +111,9 @@ namespace BitBox.Core
 
         void ProcessAccept(SocketAsyncEventArgs e)
         {
+            if (Server == null || Server.Stopped.IsTrue())
+                return;
+
             Socket socket = null;
 
             if (e.SocketError != SocketError.Success)

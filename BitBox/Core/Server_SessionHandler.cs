@@ -36,7 +36,7 @@ namespace BitBox.Core
 
         protected virtual void OnSessionAccepted(Listener listener, Socket socket)
         {
-            if (IsStopped)
+            if (Stopped.IsTrue())
                 return;
 
             // TODO 여기서 동접 체크?
