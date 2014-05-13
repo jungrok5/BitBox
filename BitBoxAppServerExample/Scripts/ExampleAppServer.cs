@@ -9,6 +9,8 @@ using BitBox.Core;
 using BitBox.Log;
 using BitBoxExample.CSCommon;
 using System.Reflection;
+using System.IO;
+using System.Xml.Serialization;
 
 namespace BitBoxAppServerExample.Scripts
 {
@@ -29,7 +31,7 @@ namespace BitBoxAppServerExample.Scripts
             List<LoggerBase> loggers = new List<LoggerBase>();
             LoggerBase mainLogger = new ConsoleLogger();
             loggers.Add(mainLogger);
-            loggers.Add(new FileLogger());
+            loggers.Add(new FileLogger(System.IO.Directory.GetCurrentDirectory() + @"\Log\ExampleAppServer.log"));
             Logger.Init(mainLogger, loggers);
 
             return true;
@@ -63,6 +65,24 @@ namespace BitBoxAppServerExample.Scripts
             if (packet.GetRemainDataSize() > 0)
             {
                 Logger.Warning(string.Format("Remain packet data [{0}] {1} bytes", ((ProtocolID)packet.GetID()).ToString(), packet.GetRemainDataSize()));
+            }
+        }
+
+        public override bool LoadServerConfig()
+        {
+            try
+            {
+                using (StreamReader sr = File.OpenText(System.IO.Directory.GetCurrentDirectory() + @"\Config\ExampleAppServer.config"))
+                {
+                    XmlSerializer serializer = new XmlSerializer(typeof(ServerConfig));
+                    m_ServerConfig = serializer.Deserialize(sr) as ServerConfig;
+                    return true;
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e);
+                return false;
             }
         }
     }
