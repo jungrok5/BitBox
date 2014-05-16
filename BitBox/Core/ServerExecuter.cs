@@ -25,7 +25,8 @@ namespace BitBox.Core
         static void Execute_Console(string[] args, string version, string name = null)
         {
             T server = new T();
-            server.Init(ServerExecuteType.Console, version, name);
+            if (server.Init(ServerExecuteType.Console, version, name) == false)
+                return;
 
             Logger.Info("Execute_Console");
 

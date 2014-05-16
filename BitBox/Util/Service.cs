@@ -14,11 +14,12 @@ namespace BitBox.Util
 
     public static class Service
     {
-        public static bool Start(string name)
+        public static bool Start(string name, string ip)
         {
             try
             {
                 ServiceController sc = new ServiceController();
+                sc.MachineName = ip;
                 sc.ServiceName = name;
                 sc.Start();
             }
@@ -30,11 +31,12 @@ namespace BitBox.Util
             return true;
         }
 
-        public static bool Stop(string name)
+        public static bool Stop(string name, string ip)
         {
             try
             {
                 ServiceController sc = new ServiceController();
+                sc.MachineName = ip;
                 sc.ServiceName = name;
                 sc.Stop();
             }
