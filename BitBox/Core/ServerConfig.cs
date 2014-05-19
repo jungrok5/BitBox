@@ -16,6 +16,7 @@ namespace BitBox.Core
         public int ReceiveBufferSize;
         public int MaxConnectionNumber;
         public int MaxAcceptOps;
+        public int SessionTimeOut;
 
         public int MinWorkerThreads;
         public int MaxWorkerThreads;

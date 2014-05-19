@@ -17,7 +17,7 @@ namespace BitBox.Core
             return KeyGenerator.Alloc();
         }
 
-        public virtual Session CreateSession(Socket socket, SocketAsyncEventArgs recvSAEA, SocketAsyncEventArgs sendSAEA)
+        public virtual void SetSocketOption(Socket socket)
         {
             if (m_ServerConfig.SendTimeOut > 0)
                 socket.SendTimeout = m_ServerConfig.SendTimeOut;
@@ -30,7 +30,11 @@ namespace BitBox.Core
 
             socket.NoDelay = true;
             socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.DontLinger, true);
+        }
 
+        public virtual Session CreateSession(Socket socket, SocketAsyncEventArgs recvSAEA, SocketAsyncEventArgs sendSAEA)
+        {
+            SetSocketOption(socket);
             return new Session(this, socket, recvSAEA, sendSAEA);
         }
 
@@ -77,6 +81,8 @@ namespace BitBox.Core
             session.SetSessionID(sessionID);
             m_Sessions.TryAdd(sessionID, session);
 
+            session.OnConnected();
+
             // TODO
             session.StartReceive();
 
@@ -107,12 +113,12 @@ namespace BitBox.Core
 
         protected virtual void OnSessionReceived(Session session, byte[] buffer, int offset, int length)
         {
-            Logger.Debug(string.Format("OnSessionReceived:{0}", session.m_ID));
+            //Logger.Debug(string.Format("OnSessionReceived:{0}", session.m_ID));
         }
 
         protected virtual void OnSessionError(Session session, string message, Exception e)
         {
-            Logger.Debug(string.Format("OnSessionError:{0}", session.m_ID));
+            Logger.Error(string.Format("OnSessionError:{0} {1} {2} {3}", session.m_ID, message, e != null ? e.Message : string.Empty, e != null ? e.StackTrace : string.Empty));
         }
     }
 }

@@ -74,5 +74,10 @@ namespace BitBoxUnity.Core
             if (Error != null)
                 Error(message, e);
         }
+
+        public virtual void OnDestroy()
+        {
+            Disconnect();
+        }
     }
 }

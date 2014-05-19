@@ -14,10 +14,13 @@ namespace BitBox.Core
     // 참고
     // http://msdn.microsoft.com/ko-kr/library/system.net.sockets.socket.receiveasync(v=vs.110).aspx
 
-    // TODO 나중에 정리하자
     public enum CloseReason : int
     {
         Unknown = 0,
+        Timeout,
+        NotConnected,
+        SocketError,
+        RemoteClose,
     }
 
     public class Session : IDisposable
@@ -39,6 +42,9 @@ namespace BitBox.Core
         public SocketAsyncEventArgs m_RecvSAEA;
         public SocketAsyncEventArgs m_SendSAEA;
 
+        public DateTime StartTime;
+        public DateTime LastActiveTime;
+
         private ConcurrentQueue<ArraySegment<byte>> m_SendQueue = new ConcurrentQueue<ArraySegment<byte>>();
         private List<ArraySegment<byte>> m_SendingList = new List<ArraySegment<byte>>();
 
@@ -46,6 +52,8 @@ namespace BitBox.Core
         private AtomicBool flagClosing = new AtomicBool();
         private AtomicBool flagSending = new AtomicBool();
         private AtomicBool flagReceiving = new AtomicBool();
+
+        private CloseReason m_ClosingReason = CloseReason.Unknown;
 
         public Session(Server server, Socket socket, SocketAsyncEventArgs recvSAEA, SocketAsyncEventArgs sendSAEA)
         {
@@ -55,6 +63,9 @@ namespace BitBox.Core
             m_SendSAEA = sendSAEA;
             m_RecvSAEA.UserToken = this;
             m_SendSAEA.UserToken = this;
+
+            StartTime = DateTime.Now;
+            LastActiveTime = StartTime;
         }
 
         public void SetSessionID(long id)
@@ -67,7 +78,7 @@ namespace BitBox.Core
             if (IsConnected() == false)
             {
                 flagReceiving.ForceFalse();
-                Disconnect();
+                Disconnect(m_ClosingReason);
                 return;
             }
 
@@ -88,7 +99,7 @@ namespace BitBox.Core
             {
                 OnError("StartReceive", e);
                 flagReceiving.ForceFalse();
-                Disconnect();
+                Disconnect(CloseReason.SocketError);
                 return;
             }
         }
@@ -103,9 +114,11 @@ namespace BitBox.Core
             }
             else
             {
-                Disconnect();
+                Disconnect(CloseReason.RemoteClose);
                 return;
             }
+
+            LastActiveTime = DateTime.Now;
 
             StartReceive();
         }
@@ -162,7 +175,7 @@ namespace BitBox.Core
             {
                 OnError("StartReceive", e);
                 flagSending.ForceFalse();
-                Disconnect();
+                Disconnect(CloseReason.SocketError);
                 return;
             }
         }
@@ -194,9 +207,16 @@ namespace BitBox.Core
             }
             else
             {
-                Disconnect();
+                Disconnect(CloseReason.SocketError);
                 return;
             }
+
+            LastActiveTime = DateTime.Now;
+        }
+
+        public bool IsAlive(DateTime limitTime)
+        {
+            return LastActiveTime > limitTime;
         }
 
         public bool IsConnected()
@@ -211,12 +231,13 @@ namespace BitBox.Core
             return true;
         }
 
-        public void Disconnect()
+        public void Disconnect(CloseReason reason)
         {
             // 받거나 보내고 있는 중이라면 Closing으로 바꾸고 넘어가자
             if (flagReceiving.IsTrue() || flagSending.IsTrue())
             {
                 flagClosing.ForceTrue();
+                m_ClosingReason = reason;
                 return;
             }
 
@@ -242,7 +263,7 @@ namespace BitBox.Core
 
                 Server = null;
 
-                OnDisconnected(CloseReason.Unknown);
+                OnDisconnected(reason);
             }
         }
 
@@ -250,7 +271,7 @@ namespace BitBox.Core
         {
         }
 
-        protected virtual void OnConnected()
+        public virtual void OnConnected()
         {
             if (Connected != null)
                 Connected(this);

@@ -61,6 +61,8 @@ namespace BitBox.Core
 
             Logger.Info("Init");
 
+            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
+
             if (LoadServerConfig() == false)
                 return false;
 
@@ -72,8 +74,6 @@ namespace BitBox.Core
        
             m_Sessions = new ConcurrentDictionary<long, Session>();
             m_Listeners = new List<Listener>();
-
-            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
 
             try
             {
@@ -124,6 +124,10 @@ namespace BitBox.Core
                 catch (Exception e)
                 {
                     Logger.Error("메모리 부족! 최대 접속 허용 인원 설정을 낮추세요", e);
+                    if (ExecuteType == ServerExecuteType.Console)
+                    {
+                        Console.ReadKey();
+                    }
                     return false;
                 }
 
@@ -134,6 +138,10 @@ namespace BitBox.Core
             catch (Exception e)
             {
                 Logger.Error("Server.Init", e);
+                if (ExecuteType == ServerExecuteType.Console)
+                {
+                    Console.ReadKey();
+                }
                 return false;
             }
         }
@@ -240,7 +248,7 @@ namespace BitBox.Core
             if (e.LastOperation != SocketAsyncOperation.Receive)
                 throw new ArgumentException(string.Format("Invalid LastOperation:{0}", e.LastOperation));
 
-            Logger.Debug(string.Format("CompletedReceive:{0}", session.m_ID));
+            //Logger.Debug(string.Format("CompletedReceive:{0}", session.m_ID));
 
             session.ProcessReceive(e);
         }
@@ -253,7 +261,7 @@ namespace BitBox.Core
             if (e.LastOperation != SocketAsyncOperation.Send)
                 throw new ArgumentException(string.Format("Invalid LastOperation:{0}", e.LastOperation));
 
-            Logger.Debug(string.Format("CompletedSend:{0}", session.m_ID));
+            //Logger.Debug(string.Format("CompletedSend:{0}", session.m_ID));
 
             session.ProcessSend(e);
         }

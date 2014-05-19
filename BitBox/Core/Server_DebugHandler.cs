@@ -15,6 +15,11 @@ namespace BitBox.Core
             // 일단 로그로 남기자
             Logger.Error("The process crashed for an unhandled exception!", (Exception)e.ExceptionObject);
 
+            if (ExecuteType == ServerExecuteType.Console)
+            {
+                Console.ReadKey();
+            }
+
             // 나중에 다시 보자 잘안되넹
             //MiniDump.Write((Exception)e.ExceptionObject);
         }
