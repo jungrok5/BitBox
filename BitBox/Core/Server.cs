@@ -64,7 +64,13 @@ namespace BitBox.Core
             AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
 
             if (LoadServerConfig() == false)
+            {
+                if (ExecuteType == ServerExecuteType.Console)
+                {
+                    Console.ReadKey();
+                }
                 return false;
+            }
 
             TheadPoolEx.SetMinMaxThreads(
                 m_ServerConfig.MinWorkerThreads == 0 ? Environment.ProcessorCount : m_ServerConfig.MinWorkerThreads,

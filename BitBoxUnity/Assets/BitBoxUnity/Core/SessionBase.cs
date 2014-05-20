@@ -34,8 +34,8 @@ namespace BitBoxUnity.Core
 
         public virtual void Disconnect()
         {
-            RemoteAddress = null;
-            Port = -1;
+            //RemoteAddress = null;
+            //Port = -1;
         }
 
         public virtual bool IsConnected()
@@ -79,5 +79,10 @@ namespace BitBoxUnity.Core
         {
             Disconnect();
         }
+        
+      	public virtual void OnApplicationQuit() 
+      	{
+      		  Disconnect();
+      	}        
     }
 }

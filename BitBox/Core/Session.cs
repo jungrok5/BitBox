@@ -77,8 +77,8 @@ namespace BitBox.Core
         {
             if (IsConnected() == false)
             {
+                Disconnect();
                 flagReceiving.ForceFalse();
-                Disconnect(m_ClosingReason);
                 return;
             }
 
@@ -231,18 +231,23 @@ namespace BitBox.Core
             return true;
         }
 
-        public void Disconnect(CloseReason reason)
+        public void Disconnect(CloseReason reason = CloseReason.Unknown)
         {
-            // 받거나 보내고 있는 중이라면 Closing으로 바꾸고 넘어가자
-            if (flagReceiving.IsTrue() || flagSending.IsTrue())
-            {
-                flagClosing.ForceTrue();
-                m_ClosingReason = reason;
-                return;
-            }
+            //// 받거나 보내고 있는 중이라면 Closing으로 바꾸고 넘어가자
+            //if (flagReceiving.IsTrue() || flagSending.IsTrue())
+            //{
+            //    flagClosing.ForceTrue();
+            //    m_ClosingReason = reason;
+            //    return;
+            //}
 
-            if (flagClosed.SetTrue() == true)
+            if (flagClosing.SetTrue() == true)
             {
+                if (reason == CloseReason.Unknown)
+                    reason = m_ClosingReason;
+                else
+                    m_ClosingReason = reason;
+
                 m_SendingList.Clear();
 
                 ArraySegment<byte> arraySeg;
@@ -264,6 +269,8 @@ namespace BitBox.Core
                 Server = null;
 
                 OnDisconnected(reason);
+
+                flagClosed.ForceTrue();
             }
         }
 
