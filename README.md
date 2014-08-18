@@ -1,4 +1,4 @@
-# BitBox
+# BitBox (CLOSED)
 C# Binary based simple network library
 
 ## Download
